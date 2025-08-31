@@ -1,0 +1,14 @@
+{
+    "fileFormatVersion": "1",
+    "parameterSets": {
+        "2HeroSlots": {
+            "design": "three_slots"
+        },
+        "4HeroSlots-TopCards": {
+            "design": "four_slots"
+        },
+        "4HeroSlots-TopHeros": {
+            "design": "four_slots_reversed"
+        }
+    }
+}

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+OPENSCAD="${OPENSCAD:-openscad}"
+EXPORT_FORMAT="${EXPORT_FORMAT:-asciistl}"
+EXPORT_EXT=stl
+
+mkdir -p target
+
+find "${@:-.}" -maxdepth 1 -type f -name '*.scad' -print0 |
+while read -d $'\0' filename; do
+    file_base="$(basename "${filename%.scad}")"
+    if [ -f "${file_base}.json" ]; then
+        parameters_file="${file_base}.json"
+        parameter_sets="$(jq -r '.parameterSets | keys []' <"$parameters_file")"
+        if [ -n "$parameter_sets" ]; then
+            while read -d $'\n' pset; do
+                if [ -z "$pset" ]; then
+                    continue
+                fi
+                "${OPENSCAD}" --export-format "$EXPORT_FORMAT" -o "target/${file_base}-${pset}.${EXPORT_EXT}" -p "$parameters_file" -P "${pset}" "$filename"
+            done <<<"$parameter_sets"
+            continue
+        fi
+    fi
+    "${OPENSCAD}" --export-format "$EXPORT_FORMAT" -o "target/${file_base}.${EXPORT_EXT}" "$filename"
+done
